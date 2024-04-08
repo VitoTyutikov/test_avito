@@ -28,8 +28,8 @@ func (r *BannerRepository) FindByID(bannerID uint) (*models.Banner, error) {
 	return &banner, err
 }
 
-func (r *BannerRepository) Update(banner *models.Banner) error {
-	return r.DB.Save(banner).Error
+func (r *BannerRepository) Update(oldBanner *models.Banner, newBanner *models.BannerRequestBody) error {
+	return r.DB.Model(oldBanner).Updates(newBanner).Error
 }
 
 func (r *BannerRepository) Delete(bannerID uint) error {
