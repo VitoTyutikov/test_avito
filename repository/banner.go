@@ -22,7 +22,7 @@ func (r *BannerRepository) FindAll() ([]models.Banner, error) {
 	return banners, err
 }
 
-func (r *BannerRepository) FindByID(bannerID uint) (*models.Banner, error) {
+func (r *BannerRepository) FindByID(bannerID uint64) (*models.Banner, error) {
 	var banner models.Banner
 	err := r.DB.Where("banner_id = ?", bannerID).First(&banner).Error
 	return &banner, err
@@ -32,8 +32,8 @@ func (r *BannerRepository) Update(oldBanner *models.Banner, newBanner *models.Ba
 	return r.DB.Model(oldBanner).Updates(newBanner).Error
 }
 
-func (r *BannerRepository) DeleteByID(bannerID uint) error {
-	return r.DB.Delete(&models.Banner{}, bannerID).Error
+func (r *BannerRepository) DeleteByID(bannerID uint64) *gorm.DB {
+	return r.DB.Delete(&models.Banner{}, bannerID)
 }
 
 func (r *BannerRepository) Create(bannerRequest *models.BannerRequestBody) (models.Banner, error) {

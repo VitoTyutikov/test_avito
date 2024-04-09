@@ -19,7 +19,7 @@ func (s *FeatureService) FindAll() ([]models.Feature, error) {
 	return s.repo.FindAll()
 }
 
-func (s *FeatureService) FindByID(featureID uint) (*models.Feature, error) {
+func (s *FeatureService) FindByID(featureID uint64) (*models.Feature, error) {
 	return s.repo.FindByID(featureID)
 }
 
@@ -27,6 +27,6 @@ func (s *FeatureService) Create(featureRequest *models.FeatureRequestBody) error
 	return s.repo.Create(featureRequest)
 }
 
-func (s *FeatureService) Delete(featureID uint) error {
+func (s *FeatureService) Delete(featureID uint64) error {
 	return s.repo.Delete(featureID)
 }

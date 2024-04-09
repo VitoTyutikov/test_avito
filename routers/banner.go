@@ -5,6 +5,7 @@ import (
 	"avito_test_task/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type BannerHandler struct {
@@ -19,13 +20,12 @@ func NewBannerHandler(bannerService *service.BannerService, bannerTagService *se
 	}
 }
 
-func (b *BannerHandler) CreateBanner(c *gin.Context) {
+func (b *BannerHandler) Create(c *gin.Context) {
 	token := c.GetHeader("token")
 	if token == "" {
 		c.Status(http.StatusUnauthorized)
 		return
-	}
-	if token != "admin_token" {
+	} else if token != "admin_token" {
 		c.Status(http.StatusForbidden)
 		return
 	}
@@ -52,6 +52,45 @@ func (b *BannerHandler) CreateBanner(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"banner_id": banner.BannerID})
-	//c.Status(http.StatusCreated)
+}
+
+func (b *BannerHandler) Delete(c *gin.Context) {
+	token := c.GetHeader("token")
+	if token == "" {
+		c.Status(http.StatusUnauthorized)
+		return
+	} else if token != "admin_token" {
+		c.Status(http.StatusForbidden)
+		return
+	}
+	idString := c.Param("id")
+	id, err := strconv.ParseUint(idString, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+	}
+	result := b.bannerService.DeleteByID(id)
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	if result.RowsAffected == 0 {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 
 }
+
+//func CheckToken(token, requiredToken string) bool {
+//	if token == "" {
+//		return false
+//	}
+//	if requiredToken == "admin_token"{
+//		return token == "admin_token"
+//	} else if requiredToken == "user_token"{
+//		return token == "user_token" || token == "admin_token"
+//
+//	}
+//}

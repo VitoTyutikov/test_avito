@@ -8,14 +8,14 @@ import (
 )
 
 func InitRoutes(r *gin.Engine) {
-	BannerHandler := NewBannerHandler(service.NewBannerService(), service.NewBannerTagService())
+	bannerHandler := NewBannerHandler(service.NewBannerService(), service.NewBannerTagService())
 
 	bannerGroup := r.Group("/banner")
 	{
 		bannerGroup.GET("", temp)
-		bannerGroup.POST("", BannerHandler.CreateBanner)
+		bannerGroup.POST("", bannerHandler.Create)
 		bannerGroup.PATCH("/:id", temp)
-		bannerGroup.DELETE("/:id", temp)
+		bannerGroup.DELETE("/:id", bannerHandler.Delete)
 	}
 	r.GET("/user-banner", temp)
 }

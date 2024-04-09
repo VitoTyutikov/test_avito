@@ -20,13 +20,13 @@ func (r *BannerTagRepository) Create(bannerTag *models.BannerTag) error {
 	return r.DB.Create(bannerTag).Error
 }
 
-func (r *BannerTagRepository) FindByID(bannerID, tagID uint) (*models.BannerTag, error) {
+func (r *BannerTagRepository) FindByID(bannerID, tagID uint64) (*models.BannerTag, error) {
 	var bannerTag models.BannerTag
 	err := r.DB.Where("banner_id = ? AND tag_id = ?", bannerID, tagID).First(&bannerTag).Error
 	return &bannerTag, err
 }
 
-func (r *BannerTagRepository) Delete(bannerID, tagID uint) error {
+func (r *BannerTagRepository) Delete(bannerID, tagID uint64) error {
 	return r.DB.Where("banner_id = ? AND tag_id = ?", bannerID, tagID).Delete(&models.BannerTag{}).Error
 }
 

@@ -3,6 +3,7 @@ package service
 import (
 	"avito_test_task/models"
 	"avito_test_task/repository"
+	"gorm.io/gorm"
 )
 
 type BannerService struct {
@@ -20,7 +21,7 @@ func (s *BannerService) Create(bannerReq *models.BannerRequestBody) (models.Bann
 	return s.repo.Create(bannerReq)
 }
 
-func (s *BannerService) FindByID(id uint) (*models.Banner, error) {
+func (s *BannerService) FindByID(id uint64) (*models.Banner, error) {
 	// Additional business logic can be added here
 	return s.repo.FindByID(id)
 }
@@ -30,7 +31,7 @@ func (s *BannerService) FindByID(id uint) (*models.Banner, error) {
 //	return s.repo.Update(banner)
 //}
 
-func (s *BannerService) DeleteByID(id uint) error {
+func (s *BannerService) DeleteByID(id uint64) *gorm.DB {
 	// Additional logic before deletion, if necessary
 	return s.repo.DeleteByID(id)
 }

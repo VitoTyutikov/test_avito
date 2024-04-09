@@ -1,7 +1,7 @@
 package models
 
 type Feature struct {
-	FeatureID   uint   `json:"feature_id" gorm:"primarykey"`
+	FeatureID   uint64 `json:"feature_id" gorm:"primarykey"`
 	Description string `json:"description"`
 }
 

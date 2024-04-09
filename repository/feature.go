@@ -22,7 +22,7 @@ func (r *FeatureRepository) FindAll() ([]models.Feature, error) {
 	return features, err
 }
 
-func (r *FeatureRepository) FindByID(featureID uint) (*models.Feature, error) {
+func (r *FeatureRepository) FindByID(featureID uint64) (*models.Feature, error) {
 	var feature models.Feature
 	err := r.DB.Where("feature_id = ?", featureID).First(&feature).Error
 	return &feature, err
@@ -35,6 +35,6 @@ func (r *FeatureRepository) Create(featureRequest *models.FeatureRequestBody) er
 	return r.DB.Create(feature).Error
 }
 
-func (r *FeatureRepository) Delete(featureID uint) error {
+func (r *FeatureRepository) Delete(featureID uint64) error {
 	return r.DB.Delete(&models.FeatureRequestBody{}, featureID).Error
 }

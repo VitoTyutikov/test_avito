@@ -19,7 +19,7 @@ func (s *TagService) FindAll() ([]models.Tag, error) {
 	return s.repo.FindAll()
 }
 
-func (s *TagService) FindByID(tagID uint) (*models.Tag, error) {
+func (s *TagService) FindByID(tagID uint64) (*models.Tag, error) {
 	return s.repo.FindByID(tagID)
 }
 
@@ -27,6 +27,6 @@ func (s *TagService) Create(tagRequest *models.TagRequestBody) error {
 	return s.repo.Create(tagRequest)
 }
 
-func (s *TagService) Delete(tagID uint) error {
+func (s *TagService) Delete(tagID uint64) error {
 	return s.repo.Delete(tagID)
 }

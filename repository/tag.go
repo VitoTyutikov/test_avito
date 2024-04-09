@@ -22,7 +22,7 @@ func (r *TagRepository) FindAll() ([]models.Tag, error) {
 	return tags, err
 }
 
-func (r *TagRepository) FindByID(tagID uint) (*models.Tag, error) {
+func (r *TagRepository) FindByID(tagID uint64) (*models.Tag, error) {
 	var tag models.Tag
 	err := r.DB.Where("tag_id = ?", tagID).First(&tag).Error
 	return &tag, err
@@ -35,6 +35,6 @@ func (r *TagRepository) Create(tagRequest *models.TagRequestBody) error {
 	return r.DB.Create(tag).Error
 }
 
-func (r *TagRepository) Delete(tagID uint) error {
+func (r *TagRepository) Delete(tagID uint64) error {
 	return r.DB.Delete(&models.Tag{}, tagID).Error
 }
