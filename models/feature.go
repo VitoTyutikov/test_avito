@@ -1,10 +1,10 @@
 package models
 
-type Features struct {
+type Feature struct {
 	FeatureID   uint   `json:"feature_id" gorm:"primarykey"`
 	Description string `json:"description"`
 }
 
-type FeaturesRequestBody struct {
+type FeatureRequestBody struct {
 	Description string `json:"description"`
 }

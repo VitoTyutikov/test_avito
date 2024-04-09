@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	db.InitDatabase()
-	fmt.Println("Test success")
+
+	fmt.Println(db.InitDatabase())
 }

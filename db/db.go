@@ -1,7 +1,6 @@
 package db
 
 import (
-	"avito_test_task/errors"
 	"avito_test_task/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -9,12 +8,29 @@ import (
 
 var DB *gorm.DB
 
-func InitDatabase() {
+func InitDatabase() error {
 	dsn := "host=localhost user=postgres password=postgres dbname=test_avito port=5432 sslmode=disable"
-	DB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	errors.CheckError(err)
-	DB.AutoMigrate(&models.Banner{})
-	DB.AutoMigrate(&models.Tags{})
-	DB.AutoMigrate(&models.Features{})
-	DB.AutoMigrate(&models.BannerTag{})
+	DB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		//Logger: logger.Default.LogMode(logger.Info),
+	})
+	if err != nil {
+		return err
+	}
+	err = DB.AutoMigrate(&models.Tag{})
+	if err != nil {
+		return err
+	}
+	err = DB.AutoMigrate(&models.Feature{})
+	if err != nil {
+		return err
+	}
+	err = DB.AutoMigrate(&models.Banner{})
+	if err != nil {
+		return err
+	}
+	err = DB.AutoMigrate(&models.BannerTag{})
+	if err != nil {
+		return err
+	}
+	return nil
 }

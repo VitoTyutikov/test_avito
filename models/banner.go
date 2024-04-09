@@ -12,6 +12,7 @@ type Banner struct {
 	IsActive  bool            `json:"is_active"`
 	CreatedAt time.Time       `json:"created_at" gorm:"type:timestamp"`
 	UpdatedAt time.Time       `json:"updated_at" gorm:"type:timestamp"`
+	Feature   Feature         `gorm:"references:FeatureID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type BannerRequestBody struct {

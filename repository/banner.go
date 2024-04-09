@@ -32,7 +32,7 @@ func (r *BannerRepository) Update(oldBanner *models.Banner, newBanner *models.Ba
 	return r.DB.Model(oldBanner).Updates(newBanner).Error
 }
 
-func (r *BannerRepository) Delete(bannerID uint) error {
+func (r *BannerRepository) DeleteByID(bannerID uint) error {
 	return r.DB.Delete(&models.Banner{}, bannerID).Error
 }
 
