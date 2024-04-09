@@ -21,3 +21,11 @@ type BannerRequestBody struct {
 	Content   json.RawMessage `json:"content"` // For JSON type in postgres, RawMessage is []byte
 	IsActive  bool            `json:"is_active"`
 }
+
+type BannerCreatePayload struct {
+	FeatureID uint            `json:"feature_id"`
+	Content   json.RawMessage `json:"content"` // For JSON type in postgres, RawMessage is []byte
+	IsActive  bool            `json:"is_active"`
+	CreatedAt time.Time       `json:"created_at"`
+	UpdatedAt time.Time       `json:"updated_at"`
+}

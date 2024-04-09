@@ -36,7 +36,7 @@ func (r *BannerRepository) DeleteByID(bannerID uint) error {
 	return r.DB.Delete(&models.Banner{}, bannerID).Error
 }
 
-func (r *BannerRepository) Create(bannerRequest *models.BannerRequestBody) error {
+func (r *BannerRepository) Create(bannerRequest *models.BannerRequestBody) (models.Banner, error) {
 	banner := models.Banner{
 		FeatureID: bannerRequest.FeatureID,
 		Content:   bannerRequest.Content,
@@ -44,5 +44,6 @@ func (r *BannerRepository) Create(bannerRequest *models.BannerRequestBody) error
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
-	return r.DB.Create(banner).Error
+	err := r.DB.Create(&banner).Error
+	return banner, err
 }

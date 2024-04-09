@@ -15,7 +15,7 @@ func NewBannerService() *BannerService {
 	}
 }
 
-func (s *BannerService) CreateBanner(bannerReq *models.BannerRequestBody) error {
+func (s *BannerService) Create(bannerReq *models.BannerRequestBody) (models.Banner, error) {
 	// Business logic can be added here before saving the banner
 	return s.repo.Create(bannerReq)
 }
