@@ -6,5 +6,5 @@ type Feature struct {
 }
 
 type FeatureRequestBody struct {
-	Description string `json:"description"`
+	Description string `json:"description" binding:"required"`
 }

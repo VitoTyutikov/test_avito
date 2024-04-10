@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"avito_test_task/hadlers"
 	"avito_test_task/models"
 	"avito_test_task/service"
 	"github.com/gin-gonic/gin"
@@ -8,16 +9,16 @@ import (
 )
 
 func InitRoutes(r *gin.Engine) {
-	bannerHandler := NewBannerHandler(service.NewBannerService(), service.NewBannerTagService())
+	bannerHandler := hadlers.NewBannerHandler(service.NewBannerService(), service.NewBannerTagService())
 
 	bannerGroup := r.Group("/banner")
 	{
-		bannerGroup.GET("", temp)
+		bannerGroup.GET("", bannerHandler.Get)
 		bannerGroup.POST("", bannerHandler.Create)
-		bannerGroup.PATCH("/:id", temp)
+		bannerGroup.PATCH("/:id", bannerHandler.Update)
 		bannerGroup.DELETE("/:id", bannerHandler.Delete)
 	}
-	r.GET("/user-banner", temp)
+	r.GET("/user_banner", bannerHandler.GetUserBanners)
 }
 
 func temp(c *gin.Context) {

@@ -5,7 +5,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"strconv"
 )
 
 var DB *gorm.DB
@@ -33,10 +32,10 @@ func InitDatabase() error {
 		return err
 	}
 
-	for i := 0; i < 20; i++ {
-		DB.Create(&models.Tag{Description: "tag_" + strconv.Itoa(i+1)})
-		DB.Create(&models.Feature{Description: "feature_" + strconv.Itoa(i+1)})
-	}
+	//for i := 0; i < 20; i++ {
+	//	DB.Create(&models.Tag{Description: "tag_" + strconv.Itoa(i+1)})
+	//	DB.Create(&models.Feature{Description: "feature_" + strconv.Itoa(i+1)})
+	//}
 
 	return nil
 }

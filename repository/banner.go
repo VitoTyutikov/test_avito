@@ -28,8 +28,13 @@ func (r *BannerRepository) FindByID(bannerID uint64) (*models.Banner, error) {
 	return &banner, err
 }
 
-func (r *BannerRepository) Update(oldBanner *models.Banner, newBanner *models.BannerRequestBody) error {
-	return r.DB.Model(oldBanner).Updates(newBanner).Error
+func (r *BannerRepository) Update(oldBanner *models.Banner, newBanner *models.BannerRequestBody) *gorm.DB {
+	//return r.DB.Model(oldBanner).Updates(newBanner).Error
+	oldBanner.FeatureID = newBanner.FeatureID
+	oldBanner.Content = newBanner.Content
+	oldBanner.IsActive = *newBanner.IsActive
+	oldBanner.UpdatedAt = time.Now()
+	return r.DB.Save(&oldBanner)
 }
 
 func (r *BannerRepository) DeleteByID(bannerID uint64) *gorm.DB {
@@ -40,7 +45,7 @@ func (r *BannerRepository) Create(bannerRequest *models.BannerRequestBody) (mode
 	banner := models.Banner{
 		FeatureID: bannerRequest.FeatureID,
 		Content:   bannerRequest.Content,
-		IsActive:  bannerRequest.IsActive,
+		IsActive:  *bannerRequest.IsActive,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}

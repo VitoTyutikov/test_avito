@@ -3,6 +3,7 @@ package service
 import (
 	"avito_test_task/models"
 	"avito_test_task/repository"
+	"gorm.io/gorm"
 )
 
 type BannerTagService struct {
@@ -26,7 +27,6 @@ func (s *BannerTagService) FindAll() ([]models.BannerTag, error) {
 func (s *BannerTagService) FindByID(bannerID, tagID uint64) (*models.BannerTag, error) {
 	return s.repo.FindByID(bannerID, tagID)
 }
-
-func (s *BannerTagService) Delete(bannerID, tagID uint64) error {
-	return s.repo.Delete(bannerID, tagID)
+func (s *BannerTagService) DeleteByBannerID(bannerID uint64) *gorm.DB {
+	return s.repo.DeleteByBannerID(bannerID)
 }

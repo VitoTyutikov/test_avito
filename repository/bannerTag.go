@@ -26,12 +26,12 @@ func (r *BannerTagRepository) FindByID(bannerID, tagID uint64) (*models.BannerTa
 	return &bannerTag, err
 }
 
-func (r *BannerTagRepository) Delete(bannerID, tagID uint64) error {
-	return r.DB.Where("banner_id = ? AND tag_id = ?", bannerID, tagID).Delete(&models.BannerTag{}).Error
-}
-
 func (r *BannerTagRepository) FindAll() ([]models.BannerTag, error) {
 	var bannerTags []models.BannerTag
 	err := r.DB.Find(&bannerTags).Error
 	return bannerTags, err
+}
+
+func (r *BannerTagRepository) DeleteByBannerID(bannerID uint64) *gorm.DB {
+	return r.DB.Where("banner_id = ?", bannerID).Delete(&models.BannerTag{})
 }
