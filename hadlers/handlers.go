@@ -1,9 +1,11 @@
 package hadlers
 
 import (
+	"avito_test_task/cache"
 	"avito_test_task/models"
 	"avito_test_task/service"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"net/http"
@@ -54,6 +56,7 @@ func (b *BannerHandler) Create(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"banner_id": banner.BannerID})
+
 }
 
 func (b *BannerHandler) Delete(c *gin.Context) {
@@ -149,6 +152,7 @@ func (b *BannerHandler) Update(c *gin.Context) {
 }
 
 func (b *BannerHandler) Get(c *gin.Context) {
+
 	token := c.GetHeader("token")
 	if token == "" {
 		c.Status(http.StatusUnauthorized)
@@ -161,11 +165,19 @@ func (b *BannerHandler) Get(c *gin.Context) {
 	tagId, _ := strconv.ParseUint(c.Query("tag_id"), 10, 64)
 	limit, _ := strconv.Atoi(c.Query("limit"))
 	offset, _ := strconv.Atoi(c.Query("offset"))
+
+	cacheKey := fmt.Sprintf("banners %d %d %d %d", featureId, tagId, limit, offset)
+	if cachedBanners, found := cache.Get(cacheKey); found {
+		c.JSON(http.StatusOK, cachedBanners)
+		return
+	}
+
 	banners, err := b.bannerService.GetBanners(featureId, tagId, limit, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+	cache.Set(cacheKey, banners)
 	c.JSON(http.StatusOK, banners)
 
 }
@@ -193,6 +205,16 @@ func (b *BannerHandler) GetUserBanners(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid feature_id"})
 		return
 	}
+	//TODO: check the when use_last_revision is not present value is false
+	useLastRevision, _ := strconv.ParseBool(c.Query("use_last_revision"))
+	cacheKey := fmt.Sprintf("bannerTag %d %d", featureId, tagId)
+	if !useLastRevision {
+		if cachedBannerTag, found := cache.Get(cacheKey); found {
+			c.JSON(http.StatusOK, cachedBannerTag.(models.Banner).Content)
+			return
+		}
+
+	}
 
 	banner, err := b.bannerService.GetUserBanner(featureId, tagId, token)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -202,6 +224,8 @@ func (b *BannerHandler) GetUserBanners(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, banner)
+	cache.Set(cacheKey, banner)
+
+	c.JSON(http.StatusOK, banner.Content)
 
 }
