@@ -22,14 +22,14 @@ func main() {
 			},
 		})
 
-		//targets = append(targets, vegeta.Target{
-		//
-		//	Method: "GET",
-		//	URL:    fmt.Sprintf("%s/banner?tag_id=%d", url, tagId),
-		//	Header: map[string][]string{
-		//		"token": {"admin_token"},
-		//	},
-		//})
+		targets = append(targets, vegeta.Target{
+
+			Method: "GET",
+			URL:    fmt.Sprintf("%s/banner?tag_id=%d", url, tagId),
+			Header: map[string][]string{
+				"token": {"admin_token"},
+			},
+		})
 
 		targets = append(targets, vegeta.Target{
 			Method: "GET",
