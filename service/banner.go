@@ -44,7 +44,9 @@ func (s *BannerService) GetBanners(featureID uint64, tagID uint64, limit int, of
 		query = query.Where("feature_id = ?", featureID)
 	}
 	if tagID != 0 {
-		query = query.Joins("JOIN banner_tags ON banners.banner_id = banner_tags.banner_id").Where("banner_tags.tag_id = ?", tagID)
+		query = query.
+			Joins("JOIN banner_tags ON banners.banner_id = banner_tags.banner_id").
+			Where("banner_tags.tag_id = ?", tagID)
 	}
 
 	if limit != 0 {
@@ -56,10 +58,35 @@ func (s *BannerService) GetBanners(featureID uint64, tagID uint64, limit int, of
 		return nil, err
 	}
 
+	//var response []models.BannerResponseBody
+	//for _, b := range banners {
+	//	var bannerTags []models.BannerTag
+	//	if err := s.bannerRepo.DB.Where("banner_id = ?", b.BannerID).
+	//		Find(&bannerTags).Error; err != nil {
+	//		return nil, err
+	//	}
+	//
+	//	tagIDs := make([]uint64, len(bannerTags))
+	//	for i, bt := range bannerTags {
+	//		tagIDs[i] = bt.TagID
+	//	}
+	//
+	//	response = append(response, models.BannerResponseBody{
+	//		BannerID:  b.BannerID,
+	//		TagIds:    tagIDs,
+	//		FeatureID: b.FeatureID,
+	//		Content:   b.Content,
+	//		IsActive:  b.IsActive,
+	//		CreatedAt: b.CreatedAt,
+	//		UpdatedAt: b.UpdatedAt,
+	//	})
+	//}
+	//TODO: это можно улучшить если использовать другой запрос
 	var response []models.BannerResponseBody
 	for _, b := range banners {
 		var bannerTags []models.BannerTag
-		if err := s.bannerRepo.DB.Where("banner_id = ?", b.BannerID).Find(&bannerTags).Error; err != nil {
+		if err := s.bannerRepo.DB.Where("banner_id = ?", b.BannerID).
+			Find(&bannerTags).Error; err != nil {
 			return nil, err
 		}
 
@@ -83,14 +110,23 @@ func (s *BannerService) GetBanners(featureID uint64, tagID uint64, limit int, of
 }
 
 func (s *BannerService) GetUserBanner(featureId uint64, tagId uint64, token string) (models.Banner, error) {
-	query := s.bannerRepo.DB.Model(&models.BannerTag{}).Where("tag_id = ?", tagId)
-	query = query.Joins("JOIN banners ON banner_tags.banner_id = banners.banner_id").Where("banners.feature_id = ?", featureId)
+	query := s.bannerRepo.DB.Model(&models.BannerTag{})
+	query = query.
+		Select("banners.*").
+		Joins("JOIN banners ON banner_tags.banner_id = banners.banner_id").
+		Where("banner_tags.tag_id = ?", tagId).
+		Where("banners.feature_id = ?", featureId)
+
 	if token == "user_token" {
 		query = query.Where("banners.is_active = ?", true)
 	}
 	var banner models.Banner
-	if err := query.Find(&banner).Error; err != nil {
-		return banner, err
+	query = query.Find(&banner)
+	if query.Error != nil {
+		return banner, query.Error
+	}
+	if query.RowsAffected == 0 {
+		return banner, gorm.ErrRecordNotFound
 	}
 	return banner, nil
 }

@@ -6,5 +6,5 @@ type Tag struct {
 }
 
 type TagRequestBody struct {
-	Description string `json:"description" binding:"required"`
+	Description string `json:"description"`
 }

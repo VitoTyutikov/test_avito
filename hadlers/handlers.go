@@ -92,7 +92,8 @@ func (b *BannerHandler) Delete(c *gin.Context) {
 
 }
 
-// здесь должна быть транзакция, тк если указаны неверные теги, то баннер обновляется, теги удаляются и новые не добавляются
+// Update Здесь по хорошему должна быть одна общая транзакция на update,delete, creates, но я не разобрался как это сделать.
+// TODO: move to repository with transaction
 func (b *BannerHandler) Update(c *gin.Context) {
 	token := c.GetHeader("token")
 	if token == "" {
@@ -123,7 +124,7 @@ func (b *BannerHandler) Update(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
+	// check no new tags which exists with feature_id added to banner
 	bannerExists, err := b.bannerService.IsBannerWithFeatureAndTagExists(request.FeatureID, request.TagIds, oldBanner.BannerID)
 	if bannerExists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "banner with this tag_id and feature_id already exists"})
@@ -220,9 +221,10 @@ func (b *BannerHandler) GetUserBanners(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid feature_id"})
 		return
 	}
-	//TODO: check the when use_last_revision is not present value is false
+
+	// include token to cacheKey because of if request not active banner with admin token it writes to cache and user will get not active banner
+	cacheKey := fmt.Sprintf("bannerTag %d %d token %s", featureId, tagId, token)
 	useLastRevision, _ := strconv.ParseBool(c.Query("use_last_revision"))
-	cacheKey := fmt.Sprintf("bannerTag %d %d", featureId, tagId)
 	if !useLastRevision {
 		if cachedBannerTag, found := cache.Get(cacheKey); found {
 			c.JSON(http.StatusOK, cachedBannerTag.(models.Banner).Content)
