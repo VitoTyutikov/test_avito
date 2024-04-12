@@ -7,7 +7,7 @@ import (
 
 type Banner struct {
 	BannerID  uint64          `json:"banner_id" gorm:"primarykey"`
-	FeatureID uint64          `json:"feature_id" gorm:"not null"`
+	FeatureID uint64          `json:"feature_id" gorm:"not null;"`
 	Content   json.RawMessage `json:"content" gorm:"type:json; not null"` // For JSON type in postgres, RawMessage is []byte
 	IsActive  bool            `json:"is_active" gorm:"not null"`
 	CreatedAt time.Time       `json:"created_at" gorm:"type:timestamp"`

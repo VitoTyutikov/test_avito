@@ -16,13 +16,15 @@ func NewBannerService() *BannerService {
 	}
 }
 
+func (s *BannerService) IsBannerWithFeatureAndTagExists(featureID uint64, tagIDs []uint64, bannerID uint64) (bool, error) {
+	return s.bannerRepo.IsBannerWithFeatureAndTagExistsWithoutBannerID(featureID, tagIDs, bannerID)
+}
+
 func (s *BannerService) Create(bannerReq *models.BannerRequestBody) (models.Banner, error) {
-	// Business logic can be added here before saving the banner
 	return s.bannerRepo.Create(bannerReq)
 }
 
 func (s *BannerService) FindByID(id uint64) (*models.Banner, error) {
-	// Additional business logic can be added here
 	return s.bannerRepo.FindByID(id)
 }
 
@@ -31,13 +33,7 @@ func (s *BannerService) UpdateBanner(oldBanner *models.Banner, newBanner *models
 }
 
 func (s *BannerService) DeleteByID(id uint64) *gorm.DB {
-	// Additional logic before deletion, if necessary
 	return s.bannerRepo.DeleteByID(id)
-}
-
-func (s *BannerService) FindAll() ([]models.Banner, error) {
-	// Logic to handle retrieval of all banners
-	return s.bannerRepo.FindAll()
 }
 
 func (s *BannerService) GetBanners(featureID uint64, tagID uint64, limit int, offset int) ([]models.BannerResponseBody, error) {
@@ -92,10 +88,13 @@ func (s *BannerService) GetUserBanner(featureId uint64, tagId uint64, token stri
 	if token == "user_token" {
 		query = query.Where("banners.is_active = ?", true)
 	}
-	banner := models.Banner{}
-	if err := query.First(&banner).Error; err != nil {
+	var banner models.Banner
+	if err := query.Find(&banner).Error; err != nil {
 		return banner, err
 	}
 	return banner, nil
+}
 
+func (s *BannerService) CreateBannerWithTags(request *models.BannerRequestBody) (models.Banner, error) {
+	return s.bannerRepo.CreateBannerWithTags(request)
 }

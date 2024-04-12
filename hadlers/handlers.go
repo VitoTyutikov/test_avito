@@ -2,6 +2,7 @@ package hadlers
 
 import (
 	"avito_test_task/cache"
+	"avito_test_task/db"
 	"avito_test_task/models"
 	"avito_test_task/service"
 	"errors"
@@ -25,6 +26,7 @@ func NewBannerHandler(bannerService *service.BannerService, bannerTagService *se
 }
 
 func (b *BannerHandler) Create(c *gin.Context) {
+
 	token := c.GetHeader("token")
 	if token == "" {
 		c.Status(http.StatusUnauthorized)
@@ -39,20 +41,21 @@ func (b *BannerHandler) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	banner, err := b.bannerService.Create(&request)
+
+	bannerExists, err := b.bannerService.IsBannerWithFeatureAndTagExists(request.FeatureID, request.TagIds, 0)
+	if bannerExists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "banner with this tag_id and feature_id already exists"})
+		return
+	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	for _, tagID := range request.TagIds {
-		if err = b.bannerTagService.Create(&models.BannerTag{
-			BannerID: banner.BannerID,
-			TagID:    tagID,
-		}); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
+	banner, err := b.bannerService.CreateBannerWithTags(&request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"banner_id": banner.BannerID})
@@ -89,6 +92,7 @@ func (b *BannerHandler) Delete(c *gin.Context) {
 
 }
 
+// здесь должна быть транзакция, тк если указаны неверные теги, то баннер обновляется, теги удаляются и новые не добавляются
 func (b *BannerHandler) Update(c *gin.Context) {
 	token := c.GetHeader("token")
 	if token == "" {
@@ -120,19 +124,30 @@ func (b *BannerHandler) Update(c *gin.Context) {
 		return
 	}
 
+	bannerExists, err := b.bannerService.IsBannerWithFeatureAndTagExists(request.FeatureID, request.TagIds, oldBanner.BannerID)
+	if bannerExists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "banner with this tag_id and feature_id already exists"})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	tx := db.DB.Begin()
 	resultUpdate := b.bannerService.UpdateBanner(oldBanner, &request)
+
 	if resultUpdate.Error != nil {
+		tx.Rollback()
 		c.JSON(http.StatusInternalServerError, gin.H{"error": resultUpdate.Error.Error()})
 		return
 	}
 
-	resultDelete := b.bannerTagService.DeleteByBannerID(id)
+	resultDelete := b.bannerTagService.DeleteByBannerID(oldBanner.BannerID)
 
 	if resultDelete.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": resultDelete.Error.Error()})
 		return
 	}
-
 	if resultDelete.RowsAffected == 0 {
 		c.Status(http.StatusNotFound)
 		return
@@ -213,9 +228,7 @@ func (b *BannerHandler) GetUserBanners(c *gin.Context) {
 			c.JSON(http.StatusOK, cachedBannerTag.(models.Banner).Content)
 			return
 		}
-
 	}
-
 	banner, err := b.bannerService.GetUserBanner(featureId, tagId, token)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		c.Status(http.StatusNotFound)
@@ -225,7 +238,6 @@ func (b *BannerHandler) GetUserBanners(c *gin.Context) {
 		return
 	}
 	cache.Set(cacheKey, banner)
-
 	c.JSON(http.StatusOK, banner.Content)
 
 }

@@ -2,10 +2,8 @@ package routers
 
 import (
 	"avito_test_task/hadlers"
-	"avito_test_task/models"
 	"avito_test_task/service"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 func InitRoutes(r *gin.Engine) {
@@ -19,11 +17,4 @@ func InitRoutes(r *gin.Engine) {
 		bannerGroup.DELETE("/:id", bannerHandler.Delete)
 	}
 	r.GET("/user_banner", bannerHandler.GetUserBanners)
-}
-
-func temp(c *gin.Context) {
-	c.JSON(http.StatusOK, models.Tag{
-		TagID:       0,
-		Description: "test",
-	})
 }

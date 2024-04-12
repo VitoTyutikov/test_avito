@@ -14,11 +14,11 @@ func InitDatabase() error {
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
+		//SkipDefaultTransaction: true,
 	})
 	if err != nil {
 		return err
 	}
-
 	if err = DB.AutoMigrate(&models.Tag{}); err != nil {
 		return err
 	}
@@ -32,9 +32,21 @@ func InitDatabase() error {
 		return err
 	}
 
-	//for i := 0; i < 20; i++ {
-	//	DB.Create(&models.Tag{Description: "tag_" + strconv.Itoa(i+1)})
-	//	DB.Create(&models.Feature{Description: "feature_" + strconv.Itoa(i+1)})
+	//for i := 0; i < 500; i++ {
+	//	if err := DB.Create(&models.Tag{Description: "tag_" + strconv.Itoa(i+1)}).Error; err != nil {
+	//		panic(err)
+	//	}
+	//	if err := DB.Create(&models.Feature{Description: "feature_" + strconv.Itoa(i+1)}).Error; err != nil {
+	//		panic(err)
+	//	}
+	//}
+	//for i := 500; i < 1000; i++ {
+	//	if err := DB.Create(&models.Tag{Description: "tag_" + strconv.Itoa(i+1)}).Error; err != nil {
+	//		panic(err)
+	//	}
+	//	if err := DB.Create(&models.Feature{Description: "feature_" + strconv.Itoa(i+1)}).Error; err != nil {
+	//		panic(err)
+	//	}
 	//}
 
 	return nil
