@@ -2,7 +2,6 @@ package hadlers
 
 import (
 	"avito_test_task/cache"
-	"avito_test_task/db"
 	"avito_test_task/models"
 	"avito_test_task/service"
 	"errors"
@@ -41,7 +40,6 @@ func (b *BannerHandler) Create(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	bannerExists, err := b.bannerService.IsBannerWithFeatureAndTagExists(request.FeatureID, request.TagIds, 0)
 	if bannerExists {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "banner with this tag_id and feature_id already exists"})
@@ -51,7 +49,6 @@ func (b *BannerHandler) Create(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	banner, err := b.bannerService.CreateBannerWithTags(&request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -92,8 +89,6 @@ func (b *BannerHandler) Delete(c *gin.Context) {
 
 }
 
-// Update Здесь по хорошему должна быть одна общая транзакция на update,delete, creates, но я не разобрался как это сделать.
-// TODO: move to repository with transaction
 func (b *BannerHandler) Update(c *gin.Context) {
 	token := c.GetHeader("token")
 	if token == "" {
@@ -134,41 +129,17 @@ func (b *BannerHandler) Update(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	tx := db.DB.Begin()
-	resultUpdate := b.bannerService.UpdateBanner(oldBanner, &request)
 
-	if resultUpdate.Error != nil {
-		tx.Rollback()
-		c.JSON(http.StatusInternalServerError, gin.H{"error": resultUpdate.Error.Error()})
+	status, err := b.bannerService.UpdateBannerWithTags(oldBanner, &request)
+
+	if err != nil {
+		c.JSON(status, gin.H{"error": err.Error()})
 		return
 	}
-
-	resultDelete := b.bannerTagService.DeleteByBannerID(oldBanner.BannerID)
-
-	if resultDelete.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": resultDelete.Error.Error()})
-		return
-	}
-	if resultDelete.RowsAffected == 0 {
-		c.Status(http.StatusNotFound)
-		return
-	}
-
-	for _, tagID := range request.TagIds {
-		if err = b.bannerTagService.Create(&models.BannerTag{
-			BannerID: id,
-			TagID:    tagID,
-		}); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-	}
-
-	c.Status(http.StatusOK)
+	c.Status(status)
 }
 
 func (b *BannerHandler) Get(c *gin.Context) {
-
 	token := c.GetHeader("token")
 	if token == "" {
 		c.Status(http.StatusUnauthorized)
@@ -182,12 +153,12 @@ func (b *BannerHandler) Get(c *gin.Context) {
 	limit, _ := strconv.Atoi(c.Query("limit"))
 	offset, _ := strconv.Atoi(c.Query("offset"))
 
+	//Здесь можно сделать ключ по фиче и тегу, а лимит и оффсет применять уже для результата
 	cacheKey := fmt.Sprintf("banners %d %d %d %d", featureId, tagId, limit, offset)
 	if cachedBanners, found := cache.Get(cacheKey); found {
 		c.JSON(http.StatusOK, cachedBanners)
 		return
 	}
-
 	banners, err := b.bannerService.GetBanners(featureId, tagId, limit, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -207,7 +178,6 @@ func (b *BannerHandler) GetUserBanners(c *gin.Context) {
 		c.Status(http.StatusForbidden)
 		return
 	}
-
 	tagIdString := c.Query("tag_id")
 	tagId, err := strconv.ParseUint(tagIdString, 10, 64)
 	if err != nil {
@@ -221,7 +191,6 @@ func (b *BannerHandler) GetUserBanners(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid feature_id"})
 		return
 	}
-
 	// include token to cacheKey because of if request not active banner with admin token it writes to cache and user will get not active banner
 	cacheKey := fmt.Sprintf("bannerTag %d %d token %s", featureId, tagId, token)
 	useLastRevision, _ := strconv.ParseBool(c.Query("use_last_revision"))

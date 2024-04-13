@@ -1,14 +1,11 @@
 Total Requests: 60000
 Success Rate: 100.00%
-Request Rate: 1000.01 requests/second
-Average Response Time: 214.512µs
-Max Response Time: 10.057743ms
-Throughput: 1000.01 requests/second
+Request Rate: 1000.02 requests/second
+Average Response Time: 1.16916ms
+Max Response Time: 39.414562ms
+Throughput: 999.99 requests/second
 Bytes Out: Total: 0 Avg: 0.00
-Bytes In: Total: 8961210 Avg: 149.35
+Bytes In: Total: 7191870000 Avg: 119864.50
 Status Codes:
-200: 60000
+        200: 60000
 Errors:
-
-
-

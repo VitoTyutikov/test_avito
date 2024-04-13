@@ -21,23 +21,30 @@ func main() {
 				"token": {"admin_token"},
 			},
 		})
-
 		targets = append(targets, vegeta.Target{
 
 			Method: "GET",
-			URL:    fmt.Sprintf("%s/banner?tag_id=%d", url, tagId),
+			URL:    fmt.Sprintf("%s/banner?tag_id=%d?feature_id=%d", url, tagId, featureId),
 			Header: map[string][]string{
 				"token": {"admin_token"},
 			},
 		})
-
-		targets = append(targets, vegeta.Target{
-			Method: "GET",
-			URL:    fmt.Sprintf("%s/banner?feature_id=%d", url, featureId),
-			Header: map[string][]string{
-				"token": {"admin_token"},
-			},
-		})
+		//targets = append(targets, vegeta.Target{
+		//
+		//	Method: "GET",
+		//	URL:    fmt.Sprintf("%s/banner?tag_id=%d", url, tagId),
+		//	Header: map[string][]string{
+		//		"token": {"admin_token"},
+		//	},
+		//})
+		//
+		//targets = append(targets, vegeta.Target{
+		//	Method: "GET",
+		//	URL:    fmt.Sprintf("%s/banner?feature_id=%d", url, featureId),
+		//	Header: map[string][]string{
+		//		"token": {"admin_token"},
+		//	},
+		//})
 	}
 	targeter := vegeta.NewStaticTargeter(targets...)
 	attacker := vegeta.NewAttacker()
@@ -51,7 +58,6 @@ func main() {
 	}
 	metrics.Close()
 
-	//fmt.Printf("Results\n: %v\n", metrics)
 	fmt.Printf("Results:\n")
 	fmt.Printf("Total Requests: %d\n", metrics.Requests)
 	fmt.Printf("Success Rate: %.2f%%\n", metrics.Success*100)
@@ -61,12 +67,12 @@ func main() {
 	fmt.Printf("Throughput: %.2f requests/second\n", metrics.Throughput)
 	fmt.Printf("Bytes Out: Total: %d Avg: %.2f\n", metrics.BytesOut.Total, float64(metrics.BytesOut.Total)/float64(metrics.Requests))
 	fmt.Printf("Bytes In: Total: %d Avg: %.2f\n", metrics.BytesIn.Total, float64(metrics.BytesIn.Total)/float64(metrics.Requests))
-	fmt.Println("Status Codes:")
+	fmt.Print("Status Codes:\n\t")
 	for code, count := range metrics.StatusCodes {
-		fmt.Printf("  %s: %d\n", code, count)
+		fmt.Printf("%s: %d\n", code, count)
 	}
-	fmt.Println("Errors:")
+	fmt.Print("Errors:\n\t")
 	for _, err := range metrics.Errors {
-		fmt.Printf("  %s\n", err)
+		fmt.Printf("%s\n", err)
 	}
 }

@@ -1,12 +1,6 @@
 package models
 
-//type BannerTag struct {
-//	BannerID uint64   `gorm:"primaryKey;autoIncrement:false"`
-//	TagID    uint64   `gorm:"primaryKey;autoIncrement:false"`
-//	Banner   Banner `gorm:"foreignKey:BannerID;references:BannerID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-//	Tag      Tag   `gorm:"foreignKey:TagID;references:TagID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-//}
-
+// BannerTag TODO: maybe add feature to bannerTag to do search faster
 type BannerTag struct {
 	BannerID uint64 `gorm:"primaryKey;autoIncrement:false"`
 	TagID    uint64 `gorm:"primaryKey;autoIncrement:false"`

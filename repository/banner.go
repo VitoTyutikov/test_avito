@@ -4,6 +4,7 @@ import (
 	"avito_test_task/db"
 	"avito_test_task/models"
 	"gorm.io/gorm"
+	"net/http"
 	"time"
 )
 
@@ -37,7 +38,7 @@ func (r *BannerRepository) FindAll() ([]models.Banner, error) {
 
 func (r *BannerRepository) FindByID(bannerID uint64) (*models.Banner, error) {
 	var banner models.Banner
-	err := r.DB.Where("banner_id = ?", bannerID).First(&banner).Error
+	err := r.DB.Where("banner_id = ?", bannerID).Find(&banner).Error
 	return &banner, err
 }
 
@@ -105,48 +106,41 @@ func (r *BannerRepository) CreateBannerWithTags(request *models.BannerRequestBod
 	return banner, nil
 }
 
-//func (r*BannerRepository) UpdateBannerWithTags(oldBanner *models.Banner, newBanner *models.BannerRequestBody) (int, error) {
-//	tx:=r.DB.Begin()
-//	resultUpdate := b.bannerService.UpdateBanner(oldBanner, &request)
-//	if resultUpdate.Error != nil {
-//		//c.JSON(http.StatusInternalServerError, gin.H{"error": resultUpdate.Error.Error()})
-//		return http.StatusInternalServerError, nil
-//	}
-//
-//	resultDelete := b.bannerTagService.DeleteByBannerID(oldBanner.BannerID)
-//
-//	if resultDelete.Error != nil {
-//		//c.JSON(http.StatusInternalServerError, gin.H{"error": resultDelete.Error.Error()})
-//		return http.StatusInternalServerError, nil
-//	}
-//	if resultDelete.RowsAffected == 0 {
-//		//c.Status(http.StatusNotFound)
-//		return http.StatusNotFound, nil
-//	}
-//	bannerExists, err := b.bannerService.IsBannerWithFeatureAndTagExists(request.FeatureID, request.TagIds)
-//	if bannerExists {
-//		//c.JSON(http.StatusBadRequest, gin.H{"error": "banner with this tag_id and feature_id already exists"})
-//		return http.StatusBadRequest, nil
-//	}
-//	if err != nil {
-//		//c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-//		return http.StatusInternalServerError, err
-//	}
-//
-//	for _, tagID := range newBanner.TagIds {
-//		if err = b.bannerTagService.Create(&models.BannerTag{
-//			BannerID: oldBanner.BannerID,
-//			TagID:    tagID,
-//		}); err != nil {
-//			//c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-//			return http.StatusInternalServerError,nil
-//		}
-//	}
-//	if err = tx.Commit().Error; err != nil {
-//		tx.Rollback()
-//		//c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-//		return http.StatusInternalServerError,nil
-//	}
-//	return http.StatusOK, nil
-//
-//}
+func (r *BannerRepository) UpdateBannerWithTags(oldBanner *models.Banner, newBanner *models.BannerRequestBody) (int, error) {
+	tx := r.DB.Session(&gorm.Session{SkipDefaultTransaction: true}).Begin()
+
+	oldBanner.FeatureID = newBanner.FeatureID
+	oldBanner.Content = newBanner.Content
+	oldBanner.IsActive = *newBanner.IsActive
+	oldBanner.UpdatedAt = time.Now()
+	resultUpdate := tx.Save(&oldBanner)
+	if resultUpdate.Error != nil {
+		tx.Rollback()
+		return http.StatusInternalServerError, resultUpdate.Error
+	}
+	resultDelete := tx.Where("banner_id = ?", oldBanner.BannerID).Delete(&models.BannerTag{})
+	if resultDelete.Error != nil {
+		tx.Rollback()
+		return http.StatusInternalServerError, resultDelete.Error
+	}
+	if resultDelete.RowsAffected == 0 {
+		tx.Rollback()
+		return http.StatusNotFound, nil
+	}
+
+	for _, tagID := range newBanner.TagIds {
+		if err := tx.Create(&models.BannerTag{
+			BannerID: oldBanner.BannerID,
+			TagID:    tagID,
+		}).Error; err != nil {
+			tx.Rollback()
+			return http.StatusInternalServerError, err
+		}
+	}
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return http.StatusInternalServerError, err
+	}
+	return http.StatusOK, nil
+
+}
