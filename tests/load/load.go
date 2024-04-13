@@ -9,7 +9,8 @@ import (
 
 func main() {
 	url := "http://localhost:8080"
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	seed := time.Now().UnixNano()
+	r := rand.New(rand.NewSource(seed))
 	var targets []vegeta.Target
 	for i := 0; i < 1000; i++ {
 		tagId := r.Int63n(10) + 1
@@ -22,29 +23,28 @@ func main() {
 			},
 		})
 		targets = append(targets, vegeta.Target{
-
 			Method: "GET",
 			URL:    fmt.Sprintf("%s/banner?tag_id=%d?feature_id=%d", url, tagId, featureId),
 			Header: map[string][]string{
 				"token": {"admin_token"},
 			},
 		})
-		//targets = append(targets, vegeta.Target{
-		//
-		//	Method: "GET",
-		//	URL:    fmt.Sprintf("%s/banner?tag_id=%d", url, tagId),
-		//	Header: map[string][]string{
-		//		"token": {"admin_token"},
-		//	},
-		//})
-		//
-		//targets = append(targets, vegeta.Target{
-		//	Method: "GET",
-		//	URL:    fmt.Sprintf("%s/banner?feature_id=%d", url, featureId),
-		//	Header: map[string][]string{
-		//		"token": {"admin_token"},
-		//	},
-		//})
+		targets = append(targets, vegeta.Target{
+
+			Method: "GET",
+			URL:    fmt.Sprintf("%s/banner?tag_id=%d", url, tagId),
+			Header: map[string][]string{
+				"token": {"admin_token"},
+			},
+		})
+
+		targets = append(targets, vegeta.Target{
+			Method: "GET",
+			URL:    fmt.Sprintf("%s/banner?feature_id=%d", url, featureId),
+			Header: map[string][]string{
+				"token": {"admin_token"},
+			},
+		})
 	}
 	targeter := vegeta.NewStaticTargeter(targets...)
 	attacker := vegeta.NewAttacker()
@@ -59,6 +59,7 @@ func main() {
 	metrics.Close()
 
 	fmt.Printf("Results:\n")
+	fmt.Printf("Seed: %d\n", seed)
 	fmt.Printf("Total Requests: %d\n", metrics.Requests)
 	fmt.Printf("Success Rate: %.2f%%\n", metrics.Success*100)
 	fmt.Printf("Request Rate: %.2f requests/second\n", float64(metrics.Requests)/metrics.Duration.Seconds())

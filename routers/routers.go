@@ -7,7 +7,7 @@ import (
 )
 
 func InitRoutes(r *gin.Engine) {
-	bannerHandler := hadlers.NewBannerHandler(service.NewBannerService(), service.NewBannerTagService())
+	bannerHandler := hadlers.NewBannerHandler(service.NewBannerService())
 
 	bannerGroup := r.Group("/banner")
 	{

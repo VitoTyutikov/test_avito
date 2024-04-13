@@ -13,19 +13,16 @@ import (
 )
 
 type BannerHandler struct {
-	bannerService    *service.BannerService
-	bannerTagService *service.BannerTagService
+	bannerService *service.BannerService
 }
 
-func NewBannerHandler(bannerService *service.BannerService, bannerTagService *service.BannerTagService) *BannerHandler {
+func NewBannerHandler(bannerService *service.BannerService) *BannerHandler {
 	return &BannerHandler{
-		bannerService:    bannerService,
-		bannerTagService: bannerTagService,
+		bannerService: bannerService,
 	}
 }
 
 func (b *BannerHandler) Create(c *gin.Context) {
-
 	token := c.GetHeader("token")
 	if token == "" {
 		c.Status(http.StatusUnauthorized)
@@ -54,9 +51,7 @@ func (b *BannerHandler) Create(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusCreated, gin.H{"banner_id": banner.BannerID})
-
 }
 
 func (b *BannerHandler) Delete(c *gin.Context) {
@@ -79,12 +74,10 @@ func (b *BannerHandler) Delete(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": result.Error.Error()})
 		return
 	}
-
 	if result.RowsAffected == 0 {
 		c.Status(http.StatusNotFound)
 		return
 	}
-
 	c.Status(http.StatusNoContent)
 
 }
@@ -110,28 +103,8 @@ func (b *BannerHandler) Update(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	oldBanner, err := b.bannerService.FindByID(id)
 
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		c.Status(http.StatusNotFound)
-		return
-	} else if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	// check no new tags which exists with feature_id added to banner
-	bannerExists, err := b.bannerService.IsBannerWithFeatureAndTagExists(request.FeatureID, request.TagIds, oldBanner.BannerID)
-	if bannerExists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "banner with this tag_id and feature_id already exists"})
-		return
-	}
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	status, err := b.bannerService.UpdateBannerWithTags(oldBanner, &request)
-
+	status, err := b.bannerService.Update(id, &request)
 	if err != nil {
 		c.JSON(status, gin.H{"error": err.Error()})
 		return
@@ -184,7 +157,6 @@ func (b *BannerHandler) GetUserBanners(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid tag_id"})
 		return
 	}
-
 	featureIdString := c.Query("feature_id")
 	featureId, err := strconv.ParseUint(featureIdString, 10, 64)
 	if err != nil {
