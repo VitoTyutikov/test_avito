@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"avito_test_task/db"
-	"avito_test_task/models"
+	"avito_test_task/internal/db"
+	"avito_test_task/internal/models"
 	"encoding/json"
 	"gorm.io/gorm"
 	"net/http"
@@ -37,28 +37,8 @@ func (r *BannerRepository) FindByID(bannerID uint64) (*models.Banner, error) {
 	return &banner, err
 }
 
-func (r *BannerRepository) Update(oldBanner *models.Banner, newBanner *models.BannerRequestBody) *gorm.DB {
-	oldBanner.FeatureID = newBanner.FeatureID
-	oldBanner.Content = newBanner.Content
-	oldBanner.IsActive = *newBanner.IsActive
-	oldBanner.UpdatedAt = time.Now()
-	return r.DB.Save(&oldBanner)
-}
-
 func (r *BannerRepository) DeleteByID(bannerID uint64) *gorm.DB {
 	return r.DB.Delete(&models.Banner{}, bannerID)
-}
-
-func (r *BannerRepository) Create(bannerRequest *models.BannerRequestBody) (models.Banner, error) {
-	banner := models.Banner{
-		FeatureID: bannerRequest.FeatureID,
-		Content:   bannerRequest.Content,
-		IsActive:  *bannerRequest.IsActive,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-	err := r.DB.Create(&banner).Error
-	return banner, err
 }
 
 func (r *BannerRepository) CreateBannerWithTags(request *models.BannerRequestBody) (models.Banner, error) {

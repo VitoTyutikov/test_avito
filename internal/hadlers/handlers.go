@@ -1,9 +1,9 @@
 package hadlers
 
 import (
-	"avito_test_task/cache"
-	"avito_test_task/models"
-	"avito_test_task/service"
+	"avito_test_task/internal/cache"
+	"avito_test_task/internal/models"
+	"avito_test_task/internal/service"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -137,7 +137,7 @@ func (b *BannerHandler) Get(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	cache.Set(cacheKey, banners)
+	go cache.Set(cacheKey, banners)
 	c.JSON(http.StatusOK, banners)
 
 }
@@ -180,7 +180,7 @@ func (b *BannerHandler) GetUserBanners(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	cache.Set(cacheKey, banner)
+	go cache.Set(cacheKey, banner)
 	c.JSON(http.StatusOK, banner.Content)
 
 }

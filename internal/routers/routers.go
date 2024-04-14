@@ -1,8 +1,8 @@
 package routers
 
 import (
-	"avito_test_task/hadlers"
-	"avito_test_task/service"
+	"avito_test_task/internal/hadlers"
+	"avito_test_task/internal/service"
 	"github.com/gin-gonic/gin"
 )
 

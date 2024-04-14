@@ -15,21 +15,3 @@ Status Codes:
         200: 60000
 Errors:
 
-
-Results:
-Seed: 1713051185951041467
-Total Requests: 60000
-Success Rate: 100.00%
-Request Rate: 1000.02 requests/second
-Average Response Time: 1.107652ms
-Max Response Time: 63.528746ms
-Throughput: 1000.00 requests/second
-Bytes Out: Total: 0 Avg: 0.00
-Bytes In: Total: 6911845485 Avg: 115197.42
-Status Codes:
-        200: 60000
-Errors:
-
-
-
-

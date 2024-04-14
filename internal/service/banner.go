@@ -1,8 +1,8 @@
 package service
 
 import (
-	"avito_test_task/models"
-	"avito_test_task/repository"
+	"avito_test_task/internal/models"
+	"avito_test_task/internal/repository"
 	"errors"
 	"gorm.io/gorm"
 	"net/http"
@@ -33,59 +33,6 @@ func (s *BannerService) UpdateBannerWithTags(oldBanner *models.Banner, newBanner
 func (s *BannerService) DeleteByID(id uint64) *gorm.DB {
 	return s.bannerRepo.DeleteByID(id)
 }
-
-//func (s *BannerService) GetBanners(featureID uint64, tagID uint64, limit int, offset int) ([]models.BannerResponseBody, error) {
-//	var banners []models.Banner
-//	query := s.bannerRepo.DB.Model(&models.Banner{})
-//
-//	if featureID != 0 {
-//		query = query.Where("feature_id = ?", featureID)
-//	}
-//	if tagID != 0 {
-//		query = query.
-//			Joins("JOIN banner_tags ON banners.banner_id = banner_tags.banner_id").
-//			Where("banner_tags.tag_id = ?", tagID)
-//	}
-//
-//	if limit != 0 {
-//		query = query.Limit(limit)
-//	}
-//	query = query.Offset(offset)
-//
-//	if err := query.Find(&banners).Error; err != nil {
-//		return nil, err
-//	}
-//
-//	bannerIDs := make([]uint64, len(banners))
-//	for i, banner := range banners {
-//		bannerIDs[i] = banner.BannerID
-//	}
-//
-//	var bannerTags []models.BannerTag
-//	if err := s.bannerRepo.DB.Where("banner_id IN ?", bannerIDs).Find(&bannerTags).Error; err != nil {
-//		return nil, err
-//	}
-//
-//	tagMap := make(map[uint64][]uint64)
-//	for _, tag := range bannerTags {
-//		tagMap[tag.BannerID] = append(tagMap[tag.BannerID], tag.TagID)
-//	}
-//
-//	response := make([]models.BannerResponseBody, 0, len(banners))
-//	for _, banner := range banners {
-//		response = append(response, models.BannerResponseBody{
-//			BannerID:  banner.BannerID,
-//			TagIds:    tagMap[banner.BannerID],
-//			FeatureID: banner.FeatureID,
-//			Content:   banner.Content,
-//			IsActive:  banner.IsActive,
-//			CreatedAt: banner.CreatedAt,
-//			UpdatedAt: banner.UpdatedAt,
-//		})
-//	}
-//
-//	return response, nil
-//}
 
 func (s *BannerService) GetBanners(featureID uint64, tagID uint64, limit int, offset int) ([]models.BannerResponseBody, error) {
 	return s.bannerRepo.GetBanners(featureID, tagID, limit, offset)

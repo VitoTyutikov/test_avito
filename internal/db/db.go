@@ -1,12 +1,11 @@
 package db
 
 import (
-	"avito_test_task/models"
+	"avito_test_task/internal/models"
 	"encoding/json"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"strconv"
 )
 
 var DB *gorm.DB
@@ -47,10 +46,10 @@ func insertTestData() {
 		return
 	}
 	for i := 0; i < 1000; i++ {
-		if err := DB.Create(&models.Tag{Description: "tag_" + strconv.Itoa(i+1)}).Error; err != nil {
+		if err := DB.Create(&models.Tag{}).Error; err != nil {
 			panic(err)
 		}
-		if err := DB.Create(&models.Feature{Description: "feature_" + strconv.Itoa(i+1)}).Error; err != nil {
+		if err := DB.Create(&models.Feature{}).Error; err != nil {
 			panic(err)
 		}
 	}
@@ -62,7 +61,7 @@ func insertTestData() {
 
 	for i := 0; i < 1000; i++ {
 		isActive := !(i%10 == 0)
-		CreateBannerWithTags(&models.BannerRequestBody{
+		_, err := CreateBannerWithTags(&models.BannerRequestBody{
 			TagIds:    []uint64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
 			FeatureID: uint64(i) + 1,
 			Content: json.RawMessage(`{
@@ -72,12 +71,17 @@ func insertTestData() {
   }`),
 			IsActive: &isActive,
 		})
+		if err != nil {
+			panic(err)
+			return
+		}
 	}
 
 }
 
 func CreateBannerWithTags(request *models.BannerRequestBody) (models.Banner, error) {
-	tx := DB.Begin()
+	tx := DB.Session(&gorm.Session{SkipDefaultTransaction: true}).Begin()
+	//tx := DB.Begin()
 	banner := models.Banner{
 		FeatureID: request.FeatureID,
 		Content:   request.Content,

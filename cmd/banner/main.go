@@ -1,8 +1,8 @@
 package main
 
 import (
-	"avito_test_task/db"
-	"avito_test_task/routers"
+	"avito_test_task/internal/db"
+	"avito_test_task/internal/routers"
 	"github.com/gin-gonic/gin"
 )
 
