@@ -25,3 +25,38 @@ Bytes In: Total: 6910689780 Avg: 115178.16
 Status Codes:
         200: 60000
 Errors:
+
+Results:
+Seed: 1713103230179509660
+Total Requests: 60000
+Success Rate: 100.00%
+Request Rate: 1000.02 requests/second
+Average Response Time: 1.883349ms
+P50 Response Time: 1.97197ms
+P95 Response Time: 3.655835ms
+P99 Response Time: 4.710325ms
+Max Response Time: 49.908979ms
+Throughput: 999.98 requests/second
+Bytes Out: Total: 0 Avg: 0.00
+Bytes In: Total: 6911170560 Avg: 115186.18
+Status Codes:
+        200: 60000
+Errors:
+
+Results:
+Seed: 1713103341616409333
+Total Requests: 60000
+Success Rate: 100.00%
+Request Rate: 1000.01 requests/second
+Average Response Time: 1.95249ms
+P50 Response Time: 2.022314ms
+P95 Response Time: 3.880609ms
+P99 Response Time: 5.287071ms
+Max Response Time: 30.751683ms
+Throughput: 999.98 requests/second
+Bytes Out: Total: 0 Avg: 0.00
+Bytes In: Total: 6911095095 Avg: 115184.92
+Status Codes:
+        200: 60000
+Errors:
+
