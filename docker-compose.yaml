@@ -1,0 +1,39 @@
+services:
+  server:
+    build:
+      context: .
+      target: final
+    ports:
+      - 8080:8080
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres
+    restart: always
+    user: postgres
+    environment:
+      POSTGRES_DB: test_avito
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    expose:
+      - 5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  tester:
+    build:
+      context: .
+      target: build
+    volumes:
+      - .:/src
+    command: go test ./tests -v
+    depends_on:
+      - db
+volumes:
+  db-data:
+

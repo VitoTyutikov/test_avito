@@ -6,12 +6,14 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"log"
 )
 
 var DB *gorm.DB
 
 func InitDatabase() error {
-	dsn := "host=localhost user=postgres password=postgres dbname=test_avito port=5432 sslmode=disable"
+
+	dsn := "host=db user=postgres password=postgres dbname=test_avito port=5432 sslmode=disable"
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
@@ -47,10 +49,10 @@ func insertTestData() {
 	}
 	for i := 0; i < 1000; i++ {
 		if err := DB.Create(&models.Tag{}).Error; err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		if err := DB.Create(&models.Feature{}).Error; err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 	}
 
@@ -72,7 +74,7 @@ func insertTestData() {
 			IsActive: &isActive,
 		})
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 			return
 		}
 	}
@@ -81,7 +83,6 @@ func insertTestData() {
 
 func CreateBannerWithTags(request *models.BannerRequestBody) (models.Banner, error) {
 	tx := DB.Session(&gorm.Session{SkipDefaultTransaction: true}).Begin()
-	//tx := DB.Begin()
 	banner := models.Banner{
 		FeatureID: request.FeatureID,
 		Content:   request.Content,

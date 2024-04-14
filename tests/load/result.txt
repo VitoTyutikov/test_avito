@@ -1,17 +1,27 @@
-In tables banners, tags, features 1k rows, in bannerTags 10k rows, cache in start testing is empty
-
-
 Results:
-Seed: 1713050876636759843
+Seed: 1713090470746245038
 Total Requests: 60000
 Success Rate: 100.00%
-Request Rate: 1000.02 requests/second
-Average Response Time: 1.090155ms
-Max Response Time: 36.842477ms
-Throughput: 1000.00 requests/second
+Request Rate: 1000.01 requests/second
+Average Response Time: 2.329086ms
+Max Response Time: 33.938345ms
+Throughput: 999.98 requests/second
 Bytes Out: Total: 0 Avg: 0.00
-Bytes In: Total: 6911710080 Avg: 115195.17
+Bytes In: Total: 6910629945 Avg: 115177.17
 Status Codes:
         200: 60000
 Errors:
 
+Results:
+Seed: 1713094300791423924
+Total Requests: 60000
+Success Rate: 100.00%
+Request Rate: 1000.02 requests/second
+Average Response Time: 2.328017ms
+Max Response Time: 41.2754ms
+Throughput: 999.96 requests/second
+Bytes Out: Total: 0 Avg: 0.00
+Bytes In: Total: 6910689780 Avg: 115178.16
+Status Codes:
+        200: 60000
+Errors:

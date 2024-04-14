@@ -34,7 +34,6 @@ func TestUserBanner(t *testing.T) {
 		{"No token", "", "1", "2", http.StatusUnauthorized},
 		{"Not fount", "user_token", "10000", "20000", http.StatusNotFound},
 	}
-
 	for _, tc := range testCases {
 		t.Run(tc.description, func(t *testing.T) {
 			req, _ := http.NewRequest("GET", ts.URL+"/user_banner?feature_id="+tc.featureId+"&tag_id="+tc.tagId, nil)
@@ -44,8 +43,8 @@ func TestUserBanner(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Failed to make request: %v", err)
 			}
-			defer res.Body.Close()
 			assert.Equal(t, tc.expectedStatus, res.StatusCode)
+			res.Body.Close()
 		})
 	}
 }

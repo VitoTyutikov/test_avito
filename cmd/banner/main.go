@@ -4,15 +4,17 @@ import (
 	"avito_test_task/internal/db"
 	"avito_test_task/internal/routers"
 	"github.com/gin-gonic/gin"
+	"log"
 )
 
 func main() {
 	if err := db.InitDatabase(); err != nil {
-		panic("init/connect to database error: " + err.Error())
+		log.Fatal("init/connect to database error: " + err.Error())
 	}
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	routers.InitRoutes(r)
 	if err := r.Run(":8080"); err != nil {
-		panic("failed to start server: " + err.Error())
+		log.Fatal("failed to start server: " + err.Error())
 	}
 }
