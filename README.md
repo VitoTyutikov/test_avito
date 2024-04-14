@@ -52,14 +52,14 @@ make restart
 ```bash
   https://www.postman.com/winter-spaceship-307094/workspace/avito/collection/24758794-42716aa1-7db0-4dbd-9224-bf626dc5e739?action=share&creator=24758794 
 ```
-- Для нагрузочного тестирования использовались 4 типа запросов. Нагрузочное тестирование начиналось с пустым кэшем.
+- Для нагрузочного тестирования использовались 4 типа запросов.
     1. ```/user_banner?tag_id=TAG&feature_id=FEATURE[i]```
     2. ```/banner?tag_id=TAG&feature_id=FEATURE[i]```
     3. ```/banner?tag_id=TAG[i]```
     4. ```/banner?feature_id=FEATURE[i]```,
   где FEATURE = [1,2,3,...,999,1000] и
        TAG = [1,2,3,...,9,10] сгенерированы рандомно.
-- Результаты нагрузочного тестирования в [result](tests/load/result.txt). 
+- Результаты двух запусков нагрузочного тестирования в [result](tests/load/result.txt). 
 - Структура базы данных:
 
 ![Структура базы данных](readme_images/img.png)
